@@ -2,7 +2,7 @@
  *
  * Use the code below to start a bare-bone express web server
  **/
-import { schema, rootValue } from "./schema";
+import { schema } from "./schema";
 import { graphqlHTTP } from "express-graphql";
 
 import express from 'express';
@@ -33,7 +33,7 @@ async function main() {
   server.use('/', 
     graphqlHTTP({
       schema,
-      rootValue,
+      // rootValue, // plus besoin
       graphiql : true
     })
   );
