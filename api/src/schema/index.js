@@ -19,9 +19,9 @@ import {
     GraphQLObjectType,
     GraphQLString,
     GraphQLInt,
-    GraphQLNonNull
+    GraphQLNonNull,
+    printSchema
 } from 'graphql';
-import numbersInRange from './types/numbers-in-range';
 import NumbersInRange from './types/numbers-in-range';
 import { numbersInRangeObject } from '../utils';
 
@@ -31,8 +31,17 @@ const QueryType = new GraphQLObjectType({
         currentTime: {
             type: GraphQLString,
             resolve: () => {
-                const isoString = new Date().toISOString();
-                return isoString.slice(11, 19);
+                return new Promise(
+                    resolve=>{
+                        setTimeout(()=>{
+                            const isoString = new Date().toISOString();
+                            resolve(isoString.slice(11, 19));
+                        },
+                        5000)
+                    }
+                );
+                
+                
             }
         },
         // sumNumberInRange: {
@@ -66,3 +75,5 @@ const QueryType = new GraphQLObjectType({
 export const schema = new GraphQLSchema({
     query: QueryType,
 });
+
+console.log(printSchema(schema));
