@@ -35,13 +35,25 @@ async function main() {
   //   console.log(`Server URL: http://localhost:${config.port}/`);
   // });
 
-  server.use('/', 
+  server.use('/',
     graphqlHTTP({
       schema,
       // rootValue, // plus besoin
       // context : { pgPool }, // context for the query
-      context : { pgApi },  // wrapper
-      graphiql : true
+      context: { pgApi },  // wrapper
+      graphiql: true,
+      customFormatErrorFn: (err) => {
+        const errorReport = {
+          message: err.message,
+          locations: err.locations,
+          stack: err.stack ? err.stack.split('\n') : [],
+          path: err.path
+        };
+        console.error('GraphQL Error', errorReport);
+        return config.isDev
+          ? errorReport
+          : { message: 'Oops! something went wrong! : (' }
+      }
     })
   );
 
