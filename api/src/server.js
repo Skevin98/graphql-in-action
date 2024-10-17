@@ -11,8 +11,13 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 import * as config from './config';
+// import pgClient from "./db/pg-client";
+import pgApiWrapper from "./db/pg-api";
+
 
 async function main() {
+  // const { pgPool } = await pgClient(); // pgPool recuperation
+  const pgApi = await pgApiWrapper();
   const server = express();
   server.use(cors());
   server.use(morgan('dev'));
@@ -34,6 +39,8 @@ async function main() {
     graphqlHTTP({
       schema,
       // rootValue, // plus besoin
+      // context : { pgPool }, // context for the query
+      context : { pgApi },  // wrapper
       graphiql : true
     })
   );

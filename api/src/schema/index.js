@@ -20,28 +20,30 @@ import {
     GraphQLString,
     GraphQLInt,
     GraphQLNonNull,
-    printSchema
+    printSchema,
+    GraphQLList
 } from 'graphql';
 import NumbersInRange from './types/numbers-in-range';
 import { numbersInRangeObject } from '../utils';
+import Task from './types/task';
 
 const QueryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
         currentTime: {
             type: GraphQLString,
-            resolve: () => {
+            resolve: () => { // Asynchronous functions
                 return new Promise(
-                    resolve=>{
-                        setTimeout(()=>{
+                    resolve => {
+                        setTimeout(() => {
                             const isoString = new Date().toISOString();
                             resolve(isoString.slice(11, 19));
                         },
-                        5000)
+                            1000)
                     }
                 );
-                
-                
+
+
             }
         },
         // sumNumberInRange: {
@@ -65,8 +67,22 @@ const QueryType = new GraphQLObjectType({
                 begin: { type: new GraphQLNonNull(GraphQLInt) },
                 end: { type: new GraphQLNonNull(GraphQLInt) }
             },
-            resolve : (source, {begin, end})=>{
+            resolve: (source, { begin, end }) => {
                 return numbersInRangeObject(begin, end);
+            }
+        },
+        taskMainList: {
+            type: new GraphQLList(new GraphQLNonNull(Task)),
+            resolve: async (source, args, { pgApi }) => {
+                // const pgResp = await pgPool.query(`
+                //     SELECT id, content, tags, user_id AS "userId", approach_count AS "approachCount", is_private AS "isPrivate", created_at AS "createdAt"
+                //     FROM azdev.tasks
+                //     WHERE is_private = FALSE
+                //     ORDER BY created_at DESC
+                //     LIMIT 100
+                // `);
+                // return pgResp.rows;
+                return pgApi.taskMainList();
             }
         }
     }
