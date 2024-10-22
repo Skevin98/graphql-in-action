@@ -55,6 +55,16 @@ const pgApiWrapper = async () => {
             });
             return Promise.all(results);
         },
+        searchResults: async (searchTerms) => {
+            const results = searchTerms.map(async (searchTerm) => {
+                const pgResp = await pgQuery(sqls.searchResults, {
+                    $1: searchTerm,
+                    $2: null, // pass logged-in userId here.
+                });
+                return pgResp.rows;
+            });
+            return Promise.all(results);
+        },
     }
 }
 

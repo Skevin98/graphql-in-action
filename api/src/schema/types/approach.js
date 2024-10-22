@@ -1,11 +1,13 @@
 import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import User from "./user";
 import Task from "./task";
+import SearchResultItem from "./search-result-item";
 
 
 
 const Approach = new GraphQLObjectType({
     name : 'Approach',
+    interfaces : ()=> [SearchResultItem],
     fields : ()=> ({ // lambda function instead of a object
         id : {
             type : new GraphQLNonNull(GraphQLID)
