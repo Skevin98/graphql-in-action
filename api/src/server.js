@@ -60,9 +60,12 @@ async function main() {
   // );
 
   server.use('/',
-    (req, res)=>{
+    (req, res) => {
       const loaders = {
-        users : new DataLoader((userIds)=> pgApi.usersInfo(userIds)),
+        users: new DataLoader((userIds) => pgApi.usersInfo(userIds)),
+        approachLists: new DataLoader((taskIds) =>
+          pgApi.approachLists(taskIds),
+        )
       };
       graphqlHTTP({
         schema,
@@ -80,7 +83,7 @@ async function main() {
             ? errorReport
             : { message: 'Oops! something went wrong! : (' }
         }
-      })(req,res);
+      })(req, res);
     }
   );
 

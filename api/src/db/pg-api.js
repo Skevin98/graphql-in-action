@@ -24,9 +24,19 @@ const pgApiWrapper = async () => {
                     )
             )
         },
-        approachList: async (taskId) => {
-            const pgResp = await pgQuery(sqls.approachesForTaskIds, { $1: [taskId] });
-            return pgResp.rows;
+        // approachList: async (taskId) => {
+        //     const pgResp = await pgQuery(sqls.approachesForTaskIds, { $1: [taskId] });
+        //     return pgResp.rows;
+        // }
+        approachLists : async (taskIds) =>{
+            const pgResp = await pgQuery(sqls.approachesForTaskIds,
+                {
+                    $1 : taskIds,
+                }
+            );
+            return taskIds.map((taskId) => 
+                pgResp.rows.filter((row)=> taskId == row.taskId)
+            )
         }
     }
 }

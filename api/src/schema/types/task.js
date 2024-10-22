@@ -45,8 +45,9 @@ const Task = new GraphQLObjectType({
         },
         approachList: {
             type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Approach))),
-            resolve : (source,args,{ pgApi })=>{
-                return pgApi.approachList(source.id);
+            resolve : (source,args,{ loaders })=>{
+                // return pgApi.approachList(source.id);
+                return loaders.approachLists.load(source.id)
             }
         }
     }
