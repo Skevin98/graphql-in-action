@@ -7,7 +7,6 @@ import {
     GraphQLInt
 } from "graphql";
 import User from "./user";
-import { extractPrefixedColumns } from "../../utils";
 import Approach from "./approach";
 
 

@@ -1,11 +1,12 @@
-import { GraphQLID, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
+import { GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import User from "./user";
+import Task from "./task";
 
 
 
 const Approach = new GraphQLObjectType({
     name : 'Approach',
-    fields : {
+    fields : ()=> ({ // lambda function instead of a object
         id : {
             type : new GraphQLNonNull(GraphQLID)
         },
@@ -28,14 +29,12 @@ const Approach = new GraphQLObjectType({
                 return loaders.users.load(source.userId);
             }
         },
-        // Task : {
-        //     type : new GraphQLNonNull(Task)
-        // },
-        // detailList : {
-        //     type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ApproachDetail)
-        //     ))
-        // }
-    }
+        task: {
+            type: new GraphQLNonNull(Task),
+            resolve: (source, args, { loaders }) =>
+            loaders.tasks.load(source.taskId)
+            },
+    })
 });
 
 export default Approach;
