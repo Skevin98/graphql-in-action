@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /** GIA NOTES
  *
  * Use the code below to start a bare-bone express web server
@@ -13,6 +14,7 @@ import morgan from 'morgan';
 import * as config from './config';
 // import pgClient from "./db/pg-client";
 import pgApiWrapper from "./db/pg-api";
+import DataLoader from "dataloader";
 
 
 async function main() {
@@ -35,26 +37,51 @@ async function main() {
   //   console.log(`Server URL: http://localhost:${config.port}/`);
   // });
 
+  // server.use('/',
+  //   graphqlHTTP({
+  //     schema,
+  //     // rootValue, // plus besoin
+  //     // context : { pgPool }, // context for the query
+  //     context: { pgApi },  // wrapper
+  //     graphiql: true,
+  //     customFormatErrorFn: (err) => {
+  //       const errorReport = {
+  //         message: err.message,
+  //         locations: err.locations,
+  //         stack: err.stack ? err.stack.split('\n') : [],
+  //         path: err.path
+  //       };
+  //       console.error('GraphQL Error', errorReport);
+  //       return config.isDev
+  //         ? errorReport
+  //         : { message: 'Oops! something went wrong! : (' }
+  //     }
+  //   })
+  // );
+
   server.use('/',
-    graphqlHTTP({
-      schema,
-      // rootValue, // plus besoin
-      // context : { pgPool }, // context for the query
-      context: { pgApi },  // wrapper
-      graphiql: true,
-      customFormatErrorFn: (err) => {
-        const errorReport = {
-          message: err.message,
-          locations: err.locations,
-          stack: err.stack ? err.stack.split('\n') : [],
-          path: err.path
-        };
-        console.error('GraphQL Error', errorReport);
-        return config.isDev
-          ? errorReport
-          : { message: 'Oops! something went wrong! : (' }
-      }
-    })
+    (req, res)=>{
+      const loaders = {
+        users : new DataLoader((userIds)=> pgApi.usersInfo(userIds)),
+      };
+      graphqlHTTP({
+        schema,
+        context: { pgApi, loaders },  // wrapper and loader
+        graphiql: true,
+        customFormatErrorFn: (err) => {
+          const errorReport = {
+            message: err.message,
+            locations: err.locations,
+            stack: err.stack ? err.stack.split('\n') : [],
+            path: err.path
+          };
+          console.error('GraphQL Error', errorReport);
+          return config.isDev
+            ? errorReport
+            : { message: 'Oops! something went wrong! : (' }
+        }
+      })(req,res);
+    }
   );
 
   server.listen(config.port, () => {

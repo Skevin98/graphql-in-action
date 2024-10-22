@@ -6,6 +6,9 @@ import {
     GraphQLList,
     GraphQLInt
 } from "graphql";
+import User from "./user";
+import { extractPrefixedColumns } from "../../utils";
+import Approach from "./approach";
 
 
 
@@ -32,6 +35,19 @@ const Task = new GraphQLObjectType({
         },
         approachCount: {
             type : new GraphQLNonNull(GraphQLInt)
+        },
+        author: {
+            type : new GraphQLNonNull(User),
+            resolve : (source, args, { loaders })=>{
+                return loaders.users.load(source.userId);
+            }
+            // resolve : prefixedObject => extractPrefixedColumns({prefixedObject, prefix : 'author'}),
+        },
+        approachList: {
+            type : new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Approach))),
+            resolve : (source,args,{ pgApi })=>{
+                return pgApi.approachList(source.id);
+            }
         }
     }
 }

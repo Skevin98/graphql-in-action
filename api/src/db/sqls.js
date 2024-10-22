@@ -1,3 +1,17 @@
+const views = {
+  tasksAndUsers: `
+  SELECT t.*,
+  u.id AS "author_id",
+  u.username AS "author_username",
+  u.first_name AS "author_firstName",
+  u.last_name AS "author_lastName",
+  u.created_at AS "author_createdAt"
+  FROM azdev.tasks t
+  JOIN azdev.users u ON (t.user_id = u.id)
+  `,
+};
+
+
 export default {
   // ------
   // SELECT
