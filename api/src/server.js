@@ -65,7 +65,8 @@ async function main() {
         users: new DataLoader((userIds) => pgApi.usersInfo(userIds)),
         approachLists: new DataLoader((taskIds) =>
           pgApi.approachLists(taskIds),
-        )
+        ),
+        tasks: new DataLoader((taskIds) => pgApi.tasksInfo(taskIds))
       };
       graphqlHTTP({
         schema,

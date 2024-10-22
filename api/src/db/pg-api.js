@@ -28,14 +28,21 @@ const pgApiWrapper = async () => {
         //     const pgResp = await pgQuery(sqls.approachesForTaskIds, { $1: [taskId] });
         //     return pgResp.rows;
         // }
-        approachLists : async (taskIds) =>{
+        approachLists: async (taskIds) => {
             const pgResp = await pgQuery(sqls.approachesForTaskIds,
                 {
-                    $1 : taskIds,
+                    $1: taskIds,
                 }
             );
-            return taskIds.map((taskId) => 
-                pgResp.rows.filter((row)=> taskId == row.taskId)
+            return taskIds.map((taskId) =>
+                pgResp.rows.filter((row) => taskId == row.taskId)
+            )
+        },
+        tasksInfo: async (taskIds) => {
+            const pgResp = await pgQuery(sqls.tasksFromIds, { $1: taskIds, $2: null });
+            return taskIds.map(
+                (taskId) =>
+                    pgResp.rows.find((row) => taskId == row.id)
             )
         }
     }
