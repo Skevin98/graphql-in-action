@@ -27,38 +27,6 @@ async function main() {
   server.use(bodyParser.json());
   server.use('/:fav.ico', (req, res) => res.sendStatus(204));
 
-  // // Example route
-  // server.use('/', (req, res) => {
-  //   res.send('Hello World');
-  // });
-
-  // // This line rus the server
-  // server.listen(config.port, () => {
-  //   console.log(`Server URL: http://localhost:${config.port}/`);
-  // });
-
-  // server.use('/',
-  //   graphqlHTTP({
-  //     schema,
-  //     // rootValue, // plus besoin
-  //     // context : { pgPool }, // context for the query
-  //     context: { pgApi },  // wrapper
-  //     graphiql: true,
-  //     customFormatErrorFn: (err) => {
-  //       const errorReport = {
-  //         message: err.message,
-  //         locations: err.locations,
-  //         stack: err.stack ? err.stack.split('\n') : [],
-  //         path: err.path
-  //       };
-  //       console.error('GraphQL Error', errorReport);
-  //       return config.isDev
-  //         ? errorReport
-  //         : { message: 'Oops! something went wrong! : (' }
-  //     }
-  //   })
-  // );
-
   server.use('/',
     (req, res) => {
       const loaders = {
@@ -66,11 +34,12 @@ async function main() {
         approachLists: new DataLoader((taskIds) =>
           pgApi.approachLists(taskIds),
         ),
-        tasks: new DataLoader((taskIds) => pgApi.tasksInfo(taskIds))
+        tasks: new DataLoader((taskIds) => pgApi.tasksInfo(taskIds)),
+        tasksByTypes : new DataLoader((types)=>pgApi.tasksByTypes(types))
       };
       graphqlHTTP({
         schema,
-        context: { pgApi, loaders },  // wrapper and loader
+        context: { loaders },  // wrapper and loader
         graphiql: true,
         customFormatErrorFn: (err) => {
           const errorReport = {

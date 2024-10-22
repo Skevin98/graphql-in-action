@@ -44,7 +44,17 @@ const pgApiWrapper = async () => {
                 (taskId) =>
                     pgResp.rows.find((row) => taskId == row.id)
             )
-        }
+        },
+        tasksByTypes: async (types) => {
+            const results = types.map(async (type) => {
+                if (type === 'latest') {
+                    const pgResp = await pgQuery(sqls.tasksLatest);
+                    return pgResp.rows;
+                }
+                throw Error('Unsupported type');
+            });
+            return Promise.all(results);
+        },
     }
 }
 
