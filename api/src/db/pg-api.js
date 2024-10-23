@@ -79,7 +79,7 @@ const pgApiWrapper = async () => {
                         message: 'firstName should not contain numbers',
                     });
                 }
-                
+
                 if (input.lastName.search(/\d/) != -1) {
                     payload.errors.push({
                         message: 'lastName should not contain numbers',
@@ -95,22 +95,51 @@ const pgApiWrapper = async () => {
                             $4: input.lastName,
                             $5: authToken,
                         });
-    
+
                         if (pgResp.rows[0]) {
                             payload.user = pgResp.rows[0];
                             payload.authToken = authToken;
-                        }    
+                        }
                     } catch (error) {
                         payload.errors.push({
-                            message : error.message
+                            message: error.message
                         })
                     }
-                    
 
-                    
+
+
                 }
                 return payload;
-            }
+            },
+            userLogin: async ({ input }) => {
+                const payload = { errors: [] };
+                if (!input.username || !input.password) {
+                    payload.errors.push({
+                        message: 'Invalid username or password',
+                    });
+                }
+                if (payload.errors.length === 0) {
+                    const pgResp = await pgQuery(sqls.userFromCredentials, {
+                        $1: input.username.toLowerCase(),
+                        $2: input.password,
+                    });
+                    const user = pgResp.rows[0];
+                    if (user) {
+                        const authToken = randomString();
+                        await pgQuery(sqls.userUpdateAuthToken, {
+                            $1: user.id,
+                            $2: authToken,
+                        });
+                        payload.user = user;
+                        payload.authToken = authToken;
+                    } else {
+                        payload.errors.push({
+                            message: 'Invalid username or password'
+                        });
+                    }
+                }
+                return payload;
+            },
         }
     }
 }
