@@ -59,6 +59,9 @@ const mongoApiWrapper = async () => {
             );
 
         },
+        mutators : {
+            
+        }
     };
 };
 export default mongoApiWrapper;

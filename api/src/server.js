@@ -43,9 +43,15 @@ async function main() {
           mongoApi.detailLists(approachIds)
         ),
       };
+
+      const mutators = {
+        ...pgApi.mutators,
+        ...mongoApi.mutators
+      };
+
       graphqlHTTP({
         schema,
-        context: { loaders },  // wrapper and loader
+        context: { loaders, mutators },  // wrapper and loader
         graphiql: true,
         customFormatErrorFn: (err) => {
           const errorReport = {
