@@ -30,15 +30,26 @@ async function main() {
   server.use('/:fav.ico', (req, res) => res.sendStatus(204));
 
   server.use('/',
-    (req, res) => {
+    async (req, res) => {
+      const authtoken =
+        req.headers.authorization
+          ? req.headers.authorization.slice(7)
+          : null;
+
+      const currentUser = await pgApi.userFromAuthToken(authtoken);
+      if (authtoken && !currentUser) {
+        return res.status(401).send({
+          errors: [{ message: 'invalid access token' }]
+        })
+      }
       const loaders = {
         users: new DataLoader((userIds) => pgApi.usersInfo(userIds)),
         approachLists: new DataLoader((taskIds) =>
           pgApi.approachLists(taskIds),
         ),
-        tasks: new DataLoader((taskIds) => pgApi.tasksInfo(taskIds)),
+        tasks: new DataLoader((taskIds) => pgApi.tasksInfo({ taskIds, currentUser })),
         tasksByTypes: new DataLoader((types) => pgApi.tasksByTypes(types)),
-        searchResults: new DataLoader((searchTerms) => pgApi.searchResults(searchTerms),),
+        searchResults: new DataLoader((searchTerms) => pgApi.searchResults({ searchTerms, currentUser }),),
         detailLists: new DataLoader((approachIds) =>
           mongoApi.detailLists(approachIds)
         ),
@@ -52,7 +63,7 @@ async function main() {
       graphqlHTTP({
         schema,
         context: { loaders, mutators },  // wrapper and loader
-        graphiql: true,
+        graphiql: { headerEditorEnabled: true },
         customFormatErrorFn: (err) => {
           const errorReport = {
             message: err.message,

@@ -8,6 +8,14 @@ const pgApiWrapper = async () => {
         pgPool.query(text, Object.values(params));
 
     return {
+        userFromAuthToken: async (authToken) => {
+            if (authToken == null) {
+                return null;
+            }
+            const pgResp = await pgQuery(sqls.userFromAuthToken, { $1: authToken });
+            return pgResp.rows[0];
+        },
+
         taskMainList: async () => {
             const pgResp = await pgQuery(sqls.tasksLatest);
             return pgResp.rows;
@@ -39,8 +47,14 @@ const pgApiWrapper = async () => {
                 pgResp.rows.filter((row) => taskId == row.taskId)
             )
         },
-        tasksInfo: async (taskIds) => {
-            const pgResp = await pgQuery(sqls.tasksFromIds, { $1: taskIds, $2: null });
+        tasksInfo: async ({ taskIds, currentUser }) => {
+            const pgResp = await pgQuery(sqls.tasksFromIds,
+                {
+                    $1: taskIds,
+                    $2: currentUser
+                        ? currentUser.id
+                        : null
+                });
             return taskIds.map(
                 (taskId) =>
                     pgResp.rows.find((row) => taskId == row.id)
@@ -56,11 +70,13 @@ const pgApiWrapper = async () => {
             });
             return Promise.all(results);
         },
-        searchResults: async (searchTerms) => {
+        searchResults: async ({ searchTerms, currentUser }) => {
             const results = searchTerms.map(async (searchTerm) => {
                 const pgResp = await pgQuery(sqls.searchResults, {
                     $1: searchTerm,
-                    $2: null, // pass logged-in userId here.
+                    $2: currentUser 
+                    ? currentUser.id 
+                    : null,
                 });
                 return pgResp.rows;
             });
