@@ -137,6 +137,18 @@ export default {
     WHERE id = $1;
   `,
 
+  //$5; userId
+   // $1: taskId
+  // $2: content
+  // $3: tags
+  // $4: TRUE if private
+  taskUpdate: `
+    UPDATE azdev.tasks
+    SET content = $2, tags = $3, is_private = $4
+    WHERE id = $1 and user_id=$5
+    RETURNING id, content, tags, user_id AS "userId", approach_count AS "approachCount", is_private AS "isPrivate", created_at AS "createdAt";
+  `,
+
   // $1: approachId
   // $2: voteIncrement
   approachVote: `
