@@ -8,6 +8,13 @@ const pgApiWrapper = async () => {
         pgPool.query(text, Object.values(params));
 
     return {
+        tasksForUsers: async (userIds) => {
+            const pgResp = await pgQuery(sqls.tasksForUsers, { $1: userIds });
+            return userIds.map((userId) =>
+                pgResp.rows.filter((row) => userId === row.userId),
+            );
+
+        },
         userFromAuthToken: async (authToken) => {
             if (authToken == null) {
                 return null;
@@ -74,9 +81,9 @@ const pgApiWrapper = async () => {
             const results = searchTerms.map(async (searchTerm) => {
                 const pgResp = await pgQuery(sqls.searchResults, {
                     $1: searchTerm,
-                    $2: currentUser 
-                    ? currentUser.id 
-                    : null,
+                    $2: currentUser
+                        ? currentUser.id
+                        : null,
                 });
                 return pgResp.rows;
             });

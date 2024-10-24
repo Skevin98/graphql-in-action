@@ -37,6 +37,8 @@ async function main() {
           : null;
 
       const currentUser = await pgApi.userFromAuthToken(authtoken);
+
+      
       if (authtoken && !currentUser) {
         return res.status(401).send({
           errors: [{ message: 'invalid access token' }]
@@ -53,6 +55,7 @@ async function main() {
         detailLists: new DataLoader((approachIds) =>
           mongoApi.detailLists(approachIds)
         ),
+        tasksForUsers: new DataLoader((userIds)=> pgApi.tasksForUsers(userIds))
       };
 
       const mutators = {
@@ -62,7 +65,7 @@ async function main() {
 
       graphqlHTTP({
         schema,
-        context: { loaders, mutators },  // wrapper and loader
+        context: { loaders, mutators, currentUser },  // wrapper and loader
         graphiql: { headerEditorEnabled: true },
         customFormatErrorFn: (err) => {
           const errorReport = {

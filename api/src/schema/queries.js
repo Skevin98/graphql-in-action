@@ -10,10 +10,18 @@ import NumbersInRange from './types/numbers-in-range';
 import { numbersInRangeObject } from '../utils';
 import Task from './types/task';
 import SearchResultItem from './types/search-result-item';
+import { Me } from './types/user';
 
 const QueryType = new GraphQLObjectType({
     name: 'Query',
-    fields: {
+    fields:()=> ({
+        me: {
+            type: Me,
+            resolve:  async (source, args, { currentUser }) => {
+                
+                return currentUser;
+            }
+        },
         currentTime: {
             type: GraphQLString,
             resolve: () => { // Asynchronous functions
@@ -75,7 +83,7 @@ const QueryType = new GraphQLObjectType({
                 return loaders.searchResults.load(args.term);
             }
         }
-    }
+    })
 });
 
 export default QueryType;
