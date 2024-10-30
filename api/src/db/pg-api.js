@@ -276,6 +276,22 @@ const pgApiWrapper = async () => {
                 return payload;
                 
 
+            },
+            taskDelete: async({taskId, currentUser})=>{
+                const payload = { errors: [] };
+                try {
+                    await pgQuery(sqls.taskDelete,{
+                        $1 : taskId,
+                        $2 : currentUser.id
+                    });
+                    payload.deletedTaskId = taskId   
+                } catch (error) {
+                    console.log(error)
+                    payload.errors.push({
+                        message : 'We were not able to delete this task',
+                    })
+                }
+                return payload;
             }
         },
     };

@@ -64,6 +64,13 @@ export const useStoreObject = () => {
      * Pass both requestText and variables as body params
      *
      */
+    const gsResp = await fetch(config.GRAPHQL_SERVER_URL,{
+      method : 'post',
+      headers : { 'Content-Type' : 'application/json'},
+      body : JSON.stringify({query : requestText, variables}),
+    }).then((response)=> response.json());
+
+    return gsResp;
   };
 
   // In React components, the following is the object you get

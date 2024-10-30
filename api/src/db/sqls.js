@@ -174,4 +174,10 @@ export default {
     DELETE FROM azdev.users
     WHERE id = $1;
   `,
+
+  // $1: taskId
+  // $2: userId
+  taskDelete : `
+  DELETE FROM azdev.tasks
+  WHERE id = $1 and user_id = $2`,
 };

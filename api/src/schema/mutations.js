@@ -9,6 +9,7 @@ import ApproachPayload from './types/payload-approach';
 import ApproachInput from './types/input-approach';
 import ApproachVoteInput from './types/input-approach-vote';
 import UserDeletePayload from './types/payload-user-delete';
+import TaskDeletePayload from './types/paylaod-task-delete';
 
 
 export const MutationType = new GraphQLObjectType({
@@ -82,6 +83,14 @@ export const MutationType = new GraphQLObjectType({
             type : new GraphQLNonNull(UserDeletePayload),
             resolve : async (source, args, { mutators, currentUser })=>
                 mutators.userDelete({currentUser})
+        },
+        taskDelete : {
+            type : new GraphQLNonNull(TaskDeletePayload),
+            args : {
+                taskId : {type : new GraphQLNonNull(GraphQLID)}
+            },
+            resolve : async (source,{taskId},{mutators, currentUser}) => 
+                mutators.taskDelete({taskId,currentUser})
         }
 
     })
