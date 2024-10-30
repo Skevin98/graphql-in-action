@@ -2,33 +2,48 @@ import React, { useState, useEffect } from 'react';
 
 import { useStore } from '../store';
 import NewApproach from './NewApproach';
-import Approach from './Approach';
-import TaskSummary from './TaskSummary';
+import Approach, {APPROACH_FRAGMENT} from './Approach';
+import TaskSummary, {TASK_SUMMARY_FRAGMENT} from './TaskSummary';
 
 /** GIA NOTES
  * Define GraphQL operations here...
  */
 
-const mockTaskInfo = {
-  id: 42,
-  content: 'Mock Task content',
-  author: { username: 'mock-author' },
-  tags: ['tag1', 'tag2'],
-  approachList: [
-    {
-      id: 42,
-      content: 'Mock Approach content',
-      author: { username: 'mock-author' },
-      voteCount: 0,
-      detailList: [
-        {
-          content: 'Mock note...',
-          category: 'NOTE',
-        },
-      ],
-    },
-  ],
-};
+const TASK_INFO = `
+  query taskInfo($taskId : ID!) {
+    taskInfo(id : $taskId) {
+      id
+      ...TaskSummary
+      approachList{
+        id
+        ...ApproachFragment
+      }
+    }
+  }
+  ${TASK_SUMMARY_FRAGMENT}
+  ${APPROACH_FRAGMENT}
+`;
+
+// const mockTaskInfo = {
+//   id: 42,
+//   content: 'Mock Task content',
+//   author: { username: 'mock-author' },
+//   tags: ['tag1', 'tag2'],
+//   approachList: [
+//     {
+//       id: 42,
+//       content: 'Mock Approach content',
+//       author: { username: 'mock-author' },
+//       voteCount: 0,
+//       detailList: [
+//         {
+//           content: 'Mock note...',
+//           category: 'NOTE',
+//         },
+//       ],
+//     },
+//   ],
+// };
 
 export default function TaskPage({ taskId }) {
   const { request, AppLink } = useStore();
@@ -46,8 +61,13 @@ export default function TaskPage({ taskId }) {
        *  2) Change the line below to use the returned data instead of mockTaskInfo:
        *
        */
+      request(TASK_INFO, { variables: { taskId } }).then(
+          ({ data }) => {
+            setTaskInfo(data.taskInfo);
+          },
+      );
 
-      setTaskInfo(mockTaskInfo); // TODO: Replace mockTaskInfo with API_RESP_FOR_taskInfo
+      // setTaskInfo(mockTaskInfo); // TODO: Replace mockTaskInfo with API_RESP_FOR_taskInfo
     }
   }, [taskId, taskInfo, request]);
 
