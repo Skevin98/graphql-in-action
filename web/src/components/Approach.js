@@ -7,6 +7,20 @@ import Errors from './Errors';
  * Define GraphQL operations here...
  */
 
+const APPROACH_VOTE = `
+    mutation approachVote($approachId : ID!, $up : Boolean!){
+        approachVote(approachId : $approachId, input : { up : $up }){
+            errors {
+                message
+            }
+            updatedApproach : approach {
+                id
+                voteCount
+            }
+        }
+    }
+`;
+
 export const APPROACH_FRAGMENT = `
     fragment ApproachFragment on Approach{
         voteCount
@@ -43,6 +57,25 @@ export default function Approach({approach, isHighlighted}) {
          setVoteCount(newVoteCount);
 
          */
+
+        const {data, errors: rootErrors} = await request(APPROACH_VOTE, {
+            variables: {
+                approachId: approach.id,
+                up: direction === 'UP'
+            }
+        });
+
+        if (rootErrors) {
+            return setUIErrors(rootErrors)
+        }
+
+        const {errors, updatedApproach } = data.approachVote;
+
+        if (errors.length > 0) {
+            return setUIErrors(errors);
+        }
+
+        setVoteCount(updatedApproach.voteCount);
     };
 
     const renderVoteButton = (direction) => (
