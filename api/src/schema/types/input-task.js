@@ -1,7 +1,7 @@
 import { GraphQLBoolean, GraphQLID, GraphQLInputObjectType, GraphQLList, GraphQLNonNull, GraphQLString } from "graphql";
 
 const TaskInput = new GraphQLInputObjectType({
-    name: 'Taskinput',
+    name: 'TaskInput',
     fields: {
         content: { type: new GraphQLNonNull(GraphQLString) },
         tags: {
@@ -17,7 +17,7 @@ const TaskInput = new GraphQLInputObjectType({
 )
 
 export const UpdateTaskInput = new GraphQLInputObjectType({
-    name: 'UpdateTaskinput',
+    name: 'UpdateTaskInput',
     fields: {
         id : { type : new GraphQLNonNull(GraphQLID)},
         content: { type: new GraphQLNonNull(GraphQLString) },

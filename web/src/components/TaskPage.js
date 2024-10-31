@@ -8,20 +8,26 @@ import TaskSummary, {TASK_SUMMARY_FRAGMENT} from './TaskSummary';
 /** GIA NOTES
  * Define GraphQL operations here...
  */
-
-const TASK_INFO = `
-  query taskInfo($taskId : ID!) {
-    taskInfo(id : $taskId) {
+export const FULL_TASK_FRAGMENT = `
+  fragment FullTaskData on Task {
+    id
+    ...TaskSummary
+    approachList {
       id
-      ...TaskSummary
-      approachList{
-        id
-        ...ApproachFragment
-      }
+      ...ApproachFragment
     }
   }
   ${TASK_SUMMARY_FRAGMENT}
   ${APPROACH_FRAGMENT}
+`;
+
+const TASK_INFO = `
+  query taskInfo($taskId : ID!) {
+    taskInfo(id : $taskId) {
+      ...FullTaskData
+    }
+  }
+  ${FULL_TASK_FRAGMENT}
 `;
 
 // const mockTaskInfo = {
