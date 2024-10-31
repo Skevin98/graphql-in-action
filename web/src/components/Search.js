@@ -5,6 +5,24 @@ import { useStore } from '../store';
 /** GIA NOTES
  * Define GraphQL operations here...
  */
+const SEARCH_RESULTS = `
+  query searchResults($searchTerm: String!) {
+    searchResults: search(term: $searchTerm) {
+      type: __typename
+        id
+        content
+        ... on Task {
+          approachCount
+        }
+        ... on Approach {
+          task {
+            id
+            content
+        }
+      }
+    }
+  }
+`;
 
 export default function Search({ searchTerm = null }) {
   const { setLocalAppState, request, AppLink } = useStore();
@@ -31,7 +49,15 @@ export default function Search({ searchTerm = null }) {
        *
        */
 
-      setSearchResults([]); // TODO: Replace empty array with API_RESP_FOR_searchResults
+      request(SEARCH_RESULTS, {
+        variables : { searchTerm }
+      }).then(
+          ({ data })=>{
+            setSearchResults(data.searchResults)
+          },
+      );
+
+      // setSearchResults([]); // TODO: Replace empty array with API_RESP_FOR_searchResults
     }
   }, [searchTerm, request]);
 
