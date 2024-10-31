@@ -7,6 +7,21 @@ import Errors from './Errors';
  * Define GraphQL operations here...
  */
 
+const USER_LOGIN = `
+  mutation userLogin($input: AuthInput!) {
+  userLogin(input: $input) {
+    errors {
+      message
+    }
+    user {
+      id
+      username
+     }
+    authToken
+  }
+}
+`;
+
 export default function Login() {
   const { request, setLocalAppState } = useStore();
   const [uiErrors, setUIErrors] = useState();
@@ -31,6 +46,28 @@ export default function Login() {
       setLocalAppState({ user, component: { name: 'Home' } });
 
     */
+
+    const {data, errors : rootErrors} = await request(USER_LOGIN, {
+      variables : {
+        input : {
+          username : input.username.value,
+          password : input.password.value
+        },
+      },
+    });
+
+    if (rootErrors){
+      return setUIErrors(rootErrors);
+    }
+
+    const { errors, user, authToken} = data.userLogin;
+
+    if (errors.length > 0) {
+      return setUIErrors(errors);
+    }
+    user.authToken = authToken;
+    window.localStorage.setItem('azdev:user', JSON.stringify(user));
+    setLocalAppState({ user, component: { name: 'Home' } });
   };
   return (
     <div className="sm-container">
